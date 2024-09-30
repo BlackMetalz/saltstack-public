@@ -1,0 +1,26 @@
+# Define the Redis instances
+{% set redis_instances = [] %}
+{% set sentinel_instances = [] %}
+{% for instance in redis_sentinel['instances'] %}
+  {% if grains['id'] in redis_sentinel['nodes'] %}
+    {% do redis_instances.append(instance['redisPort']) %}
+  {% endif %}
+  {% do sentinel_instances.append(instance['sentinelPort']) %}
+{% endfor %}
+REDIS_INSTANCES=({{ redis_instances | join(' ') }} {{ sentinel_instances | join(' ') }})
+
+# Configuration Redis instances
+{% for instance in redis_sentinel['instances'] %}
+  {% if grains['id'] in redis_sentinel['nodes'] %}
+    REDIS_HOST_{{ instance['redisPort'] }}="127.0.0.1"
+    REDIS_PORT_{{ instance['redisPort'] }}="{{ instance['redisPort'] }}"
+    REDIS_PASSWORD_{{ instance['redisPort'] }}="{{ instance['redis_password'] }}"
+  {% endif %}
+{% endfor %}
+
+# Configuration Sentinel instances
+{% for instance in redis_sentinel['instances'] %}
+  REDIS_HOST_{{ instance['sentinelPort'] }}="127.0.0.1"
+  REDIS_PORT_{{ instance['sentinelPort'] }}="{{ instance['sentinelPort'] }}"
+  REDIS_PASSWORD_{{ instance['sentinelPort'] }}="{{ instance['redis_password'] }}"
+{% endfor %}

@@ -1,0 +1,5 @@
+{
+{% for conf in ins_conf -%}
+"redis://127.0.0.1:{{conf.redisPort}}":"{{conf.redis_password if conf.redis_password != "None" else ""}}"{{ ",\n" if not loop.last else "\n"}}
+{%- endfor -%}
+}

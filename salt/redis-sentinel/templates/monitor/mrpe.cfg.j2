@@ -1,0 +1,4 @@
+{%- for conf in ins_conf -%}
+Redis-Instance::{{ conf.redisPort }} /opt/redis-check.py -p {{ conf.redisPort }} -i 127.0.0.1 -t both -w {{ conf.warn_mem|default('85') }} -c {{ conf.crit_mem|default('90') }} -role {{ conf.role }}
+Redis-Sentinel::{{conf.redisPort }} /usr/lib/nagios/plugins/check_log3.pl -c 1 -l /var/log/redis/{{ conf.sentinelPort }}-sentinel-{{ conf.serviceName }}.log -p "odown" -p "sdown" -s /tmp/{{ conf.sentinelPort }}-sentinel-{{ conf.serviceName }}.seek {{ "\n" if not loop.last else ""}}
+{%- endfor -%}

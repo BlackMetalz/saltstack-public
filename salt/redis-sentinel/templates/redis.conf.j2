@@ -1,0 +1,24 @@
+# General Config
+bind 0.0.0.0
+supervised systemd
+port {{ instance.redisPort }}
+requirepass {{ instance.redis_password }}
+masterauth {{ instance.redis_password }}
+dbfilename {{ dbfilename }}
+dir "{{ conf.dataDir }}"
+logfile "{{ redisLog }}"
+
+# Memory Config
+maxmemory {{ instance.maxMemory }}
+maxmemory-policy {{ instance.maxMemoryPolicy }}
+
+# Optimize for threads
+io-threads 4
+io-threads-do-reads yes
+
+# Replication Config
+# replica-priority # We won't need this since only 1 master and 1 slave!
+# Check if it is slave to define replicaof setting
+{% if instance.isSlave is defined %}
+replicaof {{ instance.masterHost }} {{ instance.redisPort }}
+{% endif %}
